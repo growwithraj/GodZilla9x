@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Goldman&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+user-select:none;
+font-family:'Orbitron',sans-serif;
+}
+
+body{
+background:#000;
+overflow:hidden;
+width:100vw;
+height:100vh;
+}
+
+/* WEBSITE BACKGROUND */
+
+#siteFrame{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+border:none;
+z-index:1;
+}
+
+/* FLOATING WIDGET */
+
+#widget{
+position:absolute;
+top:100px;
+left:100px;
+z-index:9999;
+cursor:move;
+touch-action:none;   /* ✅ allows touch dragging without scrolling */
+}
+
+/* MINI BUTTON */
+
+#mini{
+width:70px;
+height:70px;
+position:relative;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+}
+
+#mini img{
+width:100%;
+height:100%;
+border:2px solid #00f2ff;
+border-radius:20px;
+object-fit:cover;
+z-index:5;
+background:#000;
+}
+
+.net-wave{
+position:absolute;
+width:100%;
+height:100%;
+border:2px solid #00f2ff;
+border-radius:20px;
+animation:networkSpread 2s linear infinite;
+opacity:0;
+z-index:1;
+}
+
+.delay1{
+animation-delay:0s;
+}
+
+.delay2{
+animation-delay:1s;
+}
+
+/* MAIN PANEL */
+
+#main{
+width:230px;
+height:260px;
+background:#000814;
+border:1px solid #00f2ff;
+border-radius:12px;
+display:none;
+flex-direction:column;
+box-shadow:0 0 30px rgba(0,242,255,.3);
+position:relative;
+overflow:hidden;
+}
+
+#main::after{
+content:'';
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background-image:url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+opacity:.2;
+pointer-events:none;
+z-index:0;
+}
+
+.aura-border{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+border-radius:12px;
+box-shadow:inset 0 0 15px #00f2ff;
+animation:auraPulse 2s infinite alternate;
+z-index:1;
+pointer-events:none;
+}
+
+.header{
+background:linear-gradient(90deg,#000814,#003566);
+color:#00f2ff;
+padding:12px;
+font-family:'Goldman';
+font-size:11px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+border-bottom:2px solid #00f2ff;
+z-index:2;
+text-shadow:0 0 10px #00f2ff;
+}
+
+.close-btn{
+color:#ffc300;
+font-size:14px;
+cursor:pointer;
+font-family:serif;
+}
+
+.inner{
+padding:15px;
+text-align:center;
+height:100%;
+display:flex;
+flex-direction:column;
+justify-content:center;
+z-index:2;
+position:relative;
+gap:8px;
+}
+
+.status-badge{
+font-size:7px;
+background:#003566;
+color:#00f2ff;
+padding:2px 6px;
+border-radius:4px;
+border:1px solid #00f2ff;
+display:inline-block;
+margin-bottom:5px;
+animation:blink 1s infinite;
+}
+
+.glass-box{
+background:rgba(0,53,102,.3);
+border:1px solid rgba(0,242,255,.5);
+border-radius:10px;
+padding:12px;
+position:relative;
+backdrop-filter:blur(5px);
+}
+
+.res-text{
+font-family:'Goldman';
+font-size:28px;
+color:#fff;
+text-shadow:0 0 15px #00f2ff,0 0 30px #003566;
+letter-spacing:3px;
+margin:5px 0;
+}
+
+.data-row{
+display:flex;
+justify-content:space-between;
+margin-top:4px;
+font-size:8px;
+border-top:1px solid rgba(0,242,255,.1);
+padding-top:4px;
+}
+
+.label{
+color:#ffc300;
+font-weight:bold;
+}
+
+.value{
+color:#fff;
+}
+
+.btn{
+width:100%;
+padding:12px;
+border-radius:6px;
+border:none;
+font-family:'Goldman';
+cursor:pointer;
+text-transform:uppercase;
+font-weight:bold;
+font-size:10px;
+color:#000;
+background:linear-gradient(45deg,#00f2ff,#0077b6);
+box-shadow:0 4px 15px rgba(0,242,255,.4);
+transition:.3s;
+letter-spacing:1px;
+}
+
+.btn:active{
+transform:scale(.92);
+box-shadow:0 0 5px #00f2ff;
+}
+
+@keyframes networkSpread{
+0%{
+transform:scale(1);
+opacity:1;
+}
+100%{
+transform:scale(1.6);
+opacity:0;
+}
+}
+
+@keyframes auraPulse{
+from{
+box-shadow:inset 0 0 5px #00f2ff;
+}
+to{
+box-shadow:inset 0 0 20px #00f2ff;
+}
+}
+
+@keyframes blink{
+50%{
+opacity:.5;
+}
+}
+
+@keyframes spin{
+to{
+transform:rotate(360deg);
+}
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- LOGIN OVERLAY (unchanged) -->
+<div id="loginOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);z-index:100000;display:flex;align-items:center;justify-content:center;flex-direction:column;">
+  <div style="background:#000814;border:2px solid #00f2ff;border-radius:12px;padding:25px;text-align:center;box-shadow:0 0 30px #00f2ff;max-width:320px;">
+    <h2 style="color:#00f2ff;font-family:'Orbitron';font-size:18px;letter-spacing:2px;">🔐 ACCESS RESTRICTED</h2>
+    <p style="color:#fff;font-size:11px;margin:12px 0;font-family:'Orbitron';">Enter credentials to continue</p>
+    <input id="username" type="text" placeholder="Username" style="padding:10px;margin:5px;width:100%;max-width:240px;background:#001f3f;border:1px solid #00f2ff;color:#fff;border-radius:5px;font-family:'Orbitron';font-size:12px;outline:none;"><br>
+    <input id="password" type="password" placeholder="Password" style="padding:10px;margin:5px;width:100%;max-width:240px;background:#001f3f;border:1px solid #00f2ff;color:#fff;border-radius:5px;font-family:'Orbitron';font-size:12px;outline:none;"><br>
+    <button id="loginBtn" disabled style="padding:10px 20px;margin-top:10px;background:linear-gradient(45deg,#00f2ff,#0077b6);border:none;border-radius:6px;color:#000;font-weight:bold;cursor:pointer;font-family:'Goldman';text-transform:uppercase;letter-spacing:1px;width:100%;max-width:240px;">LOADING...</button>
+    <p id="loginError" style="color:red;font-size:10px;margin-top:10px;display:none;">❌ Invalid credentials</p>
+    <p id="loginLoading" style="color:#00f2ff;font-size:10px;margin-top:8px;">Fetching config...</p>
+  </div>
+</div>
+
+<!-- WEBSITE IN BACKGROUND (unchanged) -->
+<iframe
+id="siteFrame"
+src="https://yaarwin.org/#/register?invitationCode=37755355857">
+</iframe>
+
+<!-- MOVABLE WIDGET (unchanged) -->
+<div id="widget">
+
+<div id="mini" onclick="openM()">
+
+<div class="net-wave delay1"></div>
+<div class="net-wave delay2"></div>
+
+<img src="https://i.postimg.cc/m2dh8R3z/app-icon.jpg">
+
+</div>
+
+<div id="main">
+
+<div class="aura-border"></div>
+
+<div class="header">
+
+<span>𝐆𝐎𝐃𝐙𝐈𝐋𝐋𝐀 𝟗𝐱</span>
+
+<span class="close-btn" onclick="closeM()">
+EXIT
+</span>
+
+</div>
+
+<div class="inner" id="content"></div>
+
+</div>
+
+</div>
+
+<!-- SECURITY + LOGIN SCRIPT (unchanged) -->
+<script>
+(function() {
+  // --- Disable right-click ---
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }, true);
+
+  // --- Disable all source / devtool shortcuts ---
+  function blockShortcuts(e) {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J" || e.key === "C" || e.key === "K")) ||
+      (e.ctrlKey && (e.key === "U" || e.key === "u")) ||
+      (e.ctrlKey && (e.key === "S" || e.key === "s")) ||
+      (e.ctrlKey && (e.key === "P" || e.key === "p"))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    }
+  }
+  document.addEventListener('keydown', blockShortcuts, true);
+  // Also catch on keyup (some browsers)
+  document.addEventListener('keyup', function(e) {
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "J"))) {
+      e.preventDefault();
+    }
+  }, true);
+
+  // --- Login logic ---
+  var loginOverlay = document.getElementById('loginOverlay');
+  var siteFrame = document.getElementById('siteFrame');
+  var widget = document.getElementById('widget');
+  var usernameInput = document.getElementById('username');
+  var passwordInput = document.getElementById('password');
+  var loginBtn = document.getElementById('loginBtn');
+  var loginError = document.getElementById('loginError');
+  var loginLoading = document.getElementById('loginLoading');
+
+  // Default credentials (used if config.json is missing)
+  var credentials = {
+    username: "admin",
+    password: "Godzilla9x"
+  };
+
+  // Hide main content until login
+  siteFrame.style.display = 'none';
+  widget.style.display = 'none';
+
+  // Try to fetch config.json
+  fetch('config.json')
+    .then(function(response) {
+      if (!response.ok) throw new Error('Not found');
+      return response.json();
+    })
+    .then(function(data) {
+      if (data.username) credentials.username = data.username;
+      if (data.password) credentials.password = data.password;
+    })
+    .catch(function() {
+      console.warn('config.json not found, using default credentials');
+    })
+    .finally(function() {
+      // Ready to login
+      loginLoading.style.display = 'none';
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'LOGIN';
+    });
+
+  // Login handler
+  function tryLogin() {
+    var user = usernameInput.value.trim();
+    var pass = passwordInput.value.trim();
+    if (user === credentials.username && pass === credentials.password) {
+      // Success – show main content
+      loginOverlay.style.display = 'none';
+      siteFrame.style.display = 'block';   // iframe visible
+      widget.style.display = 'block';      // widget container visible
+    } else {
+      loginError.style.display = 'block';
+    }
+  }
+
+  loginBtn.addEventListener('click', tryLogin);
+
+  // Allow Enter key
+  passwordInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') tryLogin();
+  });
+  usernameInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') tryLogin();
+  });
+
+})();
+</script>
+
+<!-- ORIGINAL SCRIPT (unchanged) -->
+<script>
+
+const API =
+'https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json?ts=';
+
+const TeamBridge = {
+
+resizeView:(w,h)=>{},
+
+loadUrl:(url)=>{
+window.open(url,'_blank');
+},
+
+speak:(text)=>{
+
+if('speechSynthesis' in window){
+
+speechSynthesis.cancel();
+
+speechSynthesis.speak(
+new SpeechSynthesisUtterance(text)
+);
+}
+}
+};
+
+var state = 'wingo';
+var results = {};
+
+/* OPEN */
+
+function openM(){
+
+document.getElementById('main').style.display='flex';
+document.getElementById('mini').style.display='none';
+
+render();
+}
+
+/* CLOSE */
+
+function closeM(){
+
+document.getElementById('main').style.display='none';
+document.getElementById('mini').style.display='flex';
+}
+
+/* RENDER */
+
+function render(){
+
+var cont =
+document.getElementById('content');
+
+cont.innerHTML =
+
+'<div class="status-badge" style="border-color:#00f2ff">'+
+'CONNECTION: STABLE'+
+'</div>'+
+
+'<div class="glass-box">'+
+
+'<p style="color:#00f2ff;font-size:10px;">'+
+'ID: '+
+Math.floor(Math.random()*90000+10000)+
+'</p>'+
+
+'<b style="color:#fff;font-size:14px;">'+
+'LIVE RESULT FETCHER'+
+'</b>'+
+
+'</div>'+
+
+'<button class="btn" onclick="start()">'+
+'START INJECTION ⚡'+
+'</button>';
+}
+
+/* START */
+
+async function start(){
+
+state = 'scanning';
+
+document.getElementById('content').innerHTML =
+
+'<div class="status-badge">'+
+'BYPASSING FIREWALL...'+
+'</div>'+
+
+'<div class="glass-box">'+
+
+'<div style="'+
+'width:40px;'+
+'height:40px;'+
+'margin:5px auto;'+
+'border:3px solid #00f2ff;'+
+'border-radius:50%;'+
+'border-top-color:transparent;'+
+'animation:spin 0.6s linear infinite;">'+
+'</div>'+
+
+'<p style="'+
+'color:#00f2ff;'+
+'font-size:10px;'+
+'margin-top:5px;">'+
+
+'EXTRACTING PACKETS'+
+
+'</p>'+
+
+'</div>'+
+
+'<button class="btn" style="opacity:0.5;background:#333;">'+
+'PLEASE WAIT...'+
+'</button>';
+
+try{
+
+const res =
+await fetch(API + Date.now());
+
+const data =
+await res.json();
+
+const latest =
+data.data.list[0];
+
+const period =
+latest.issueNumber;
+
+const number =
+parseInt(latest.number);
+
+const size =
+number <= 4
+? 'SMALL'
+: 'BIG';
+
+results[period] = {
+n:number,
+sz:size
+};
+
+setTimeout(function(){
+
+showRes(period,true);
+
+},3500);
+
+}catch(e){
+
+console.log(e);
+
+document.getElementById('content').innerHTML =
+
+'<div class="status-badge">'+
+'SERVER ERROR'+
+'</div>'+
+
+'<div class="glass-box">'+
+
+'<p style="color:red;font-size:10px;">'+
+'API CONNECTION FAILED'+
+'</p>'+
+
+'</div>';
+}
+}
+
+/* RESULT */
+
+function showRes(p, shouldSpeak){
+
+state = 'result';
+
+var d = results[p];
+
+document.getElementById('content').innerHTML =
+
+'<div class="status-badge" style="background:#fff;color:#000;">'+
+'ENCRYPTED DATA FOUND'+
+'</div>'+
+
+'<div class="glass-box">'+
+
+'<h1 class="res-text">'+
+d.sz+' '+d.n+
+'</h1>'+
+
+'<div class="data-row">'+
+
+'<span class="label">'+
+'PERIOD'+
+'</span>'+
+
+'<span class="value">'+
+p.slice(-4)+
+'</span>'+
+
+'</div>'+
+
+'<div class="data-row">'+
+
+'<span class="label">'+
+'ACCURACY'+
+'</span>'+
+
+'<span class="value">'+
+'98.4%'+
+'</span>'+
+
+'</div>'+
+
+'</div>'+
+
+'<button class="btn" onclick="start()">'+
+'NEXT INJECTION'+
+'</button>';
+
+if(shouldSpeak){
+
+TeamBridge.speak(
+d.sz+' '+d.n
+);
+}
+}
+
+/* ✅ DRAGGABLE WIDGET – now works with mouse AND touch (phones) */
+const widget = document.getElementById("widget");
+
+let isDragging = false;
+let startX, startY, initialLeft, initialTop;
+
+widget.addEventListener("pointerdown", (e) => {
+  isDragging = true;
+  widget.setPointerCapture(e.pointerId);   // capture all pointer events
+  startX = e.clientX;
+  startY = e.clientY;
+  initialLeft = widget.offsetLeft;
+  initialTop = widget.offsetTop;
+  // no preventDefault – so the inner button’s click still fires on tap
+});
+
+widget.addEventListener("pointermove", (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  widget.style.left = (initialLeft + dx) + "px";
+  widget.style.top = (initialTop + dy) + "px";
+});
+
+widget.addEventListener("pointerup", (e) => {
+  isDragging = false;
+  widget.releasePointerCapture(e.pointerId);
+});
+
+widget.addEventListener("pointercancel", (e) => {
+  isDragging = false;
+  widget.releasePointerCapture(e.pointerId);
+});
+
+</script>
+
+</body>
+</html>
